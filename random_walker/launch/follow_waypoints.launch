@@ -1,0 +1,11 @@
+<launch>
+  <!-- launch the localisation package -->
+  <include file="$(find fetch_navigation)/launch/fetch_nav.launch" />
+
+  <!-- launch the waypoint follower script -->
+  <node pkg="random_walker" name="follow_waypoints" type="follow_waypoints.py">
+  </node>
+
+  <!-- launch rviz -->
+  <include file="$(find rtabmap_ros)/launch/demo/demo_turtlebot_rviz.launch" />
+</launch>
