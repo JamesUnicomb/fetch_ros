@@ -1,0 +1,10 @@
+<launch>
+  <node pkg="joy" type="joy_node" name="joy_node">
+    <param name="dev" value="/dev/input/js1" />
+    <param name="deadzone" value="0.5" />
+    <param name="autorepeat_rate" value="20" />
+    <remap from="/joy" to="/fetch_joy" />
+  </node>
+
+  <node pkg="fetch_ai" name="arm_control_node" type="arm_joy_controller.py" output="screen" />
+</launch>

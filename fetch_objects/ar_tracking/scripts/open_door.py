@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-# wave.py: "Wave" the fetch gripper
 import rospy
 import tf
 import tf_conversions
@@ -8,8 +7,7 @@ import numpy as np
 import PyKDL
 from moveit_msgs.msg import MoveItErrorCodes
 from moveit_python import MoveGroupInterface, PlanningSceneInterface
-from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
-from control_msgs.msg import GripperCommand
+from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, Twist
 from tf.transformations import quaternion_from_euler
 from math import radians, pi
 from geometry_msgs.msg import Pose, Quaternion, Point
@@ -21,23 +19,24 @@ from geometry_msgs.msg import Pose, Quaternion, Point
 #          of are itself & the floor.
 if __name__ == '__main__':
     rospy.init_node('ar_detect_and_grab')
+   
+    cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size = 10)
 
     listener = tf.TransformListener()
 
     try:
-        listener.waitForTransform('/base_link', 'handle_0', rospy.Time(0), rospy.Duration(4.0))
-        (trans, rot) = listener.lookupTransform('/base_link', '/handle_0', rospy.Time(0))
+        listener.waitForTransform('/base_link', '/card_reader', rospy.Time(0), rospy.Duration(4.0))
+        (trans, rot) = listener.lookupTransform('/base_link', '/card_reader', rospy.Time(0))
         res = Pose(Point(*trans), Quaternion(*rot))
         frame_gripper_link = PyKDL.Frame(PyKDL.Vector(-0.166,0.0,0.0))
         (trans_res, rot_res) = tf_conversions.posemath.toTf(tf_conversions.posemath.fromMsg(res) * frame_gripper_link)
-        frame_prep_link = PyKDL.Frame(PyKDL.Vector(-0.35,0.0,0.0))
+        frame_prep_link = PyKDL.Frame(PyKDL.Vector(-0.166,0.0,0.1))
         (trans_prep, rot_prep) = tf_conversions.posemath.toTf(tf_conversions.posemath.fromMsg(res) * frame_prep_link)
     except (tf.LookupException, tf.ConnectivityException):
         print 'couldnt get transform to handle'
 
     # Create move group interface for a fetch robot
     move_group = MoveGroupInterface("arm_with_torso", "base_link")
-    gripper_group = MoveGroupInterface("gripper", "base_link")
 
     # Define ground plane
     # This creates objects in the planning scene that mimic the ground
@@ -57,17 +56,10 @@ if __name__ == '__main__':
     # Position and rotation of two "wave end poses"
     gripper_poses = [Pose(Point(*trans_prep), Quaternion(*rot_prep)),
                      Pose(Point(*trans_res), Quaternion(*rot_res)),
-                     Pose(Point(*trans_prep), Quaternion(*rot_prep))]
+                     Pose(Point(*trans_prep), Quaternion(*rot_prep)),
+                     Pose(Point(0.055, -0.140, 0.623),
+                               Quaternion(0.460, -0.504, 0.511, 0.523))]
 
-    closed_grip = GripperCommand()
-    closed_grip.position = 0.0
-    closed_grip.effort = 10.0
-
-    open_grip = GripperCommand()
-    open_grip.position = 0.1
-    open_grip.effort = 10.0
-
-    gripper_grasps = [open_grip, closed_grip, open_grip]
     
     # Construct a "pose_stamped" message as required by moveToPose
     gripper_pose_stamped = PoseStamped()
@@ -86,7 +78,6 @@ if __name__ == '__main__':
         result = move_group.get_move_action().get_result()
 
         if result:
-            print gripper_group
             # Checking the MoveItErrorCode
             if result.error_code.val == MoveItErrorCodes.SUCCESS:
                 rospy.loginfo("Hello there!")
@@ -101,3 +92,13 @@ if __name__ == '__main__':
     # This stops all arm movement goals
     # It should be called when a program is exiting so movement stops
     move_group.get_move_action().cancel_all_goals()
+
+    timeout = rospy.Time.now() + rospy.Duration(6.7)
+    rate = rospy.Rate(10)
+    pub_cmd = Twist()
+    pub_cmd.linear.x = 0.15
+    while rospy.Time.now() < timeout:
+        cmd_vel_pub.publish(pub_cmd)
+
+    pub_cmd = Twist()
+    cmd_vel_pub.publish(pub_cmd)
