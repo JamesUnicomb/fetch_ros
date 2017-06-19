@@ -5,6 +5,10 @@
 ## Fetch Navigation
 
 ## Fecth Arm Control with Joystick
+Python script with modified API from OpenAI Fetch ROSBridge.
+
+[![Watch the video](https://github.com/JamesUnicomb/fetch_ros/blob/master/Fetch_arm_joy.png)](https://www.youtube.com/watch?v=3cNEbnp6NGQ)
+Video Link: https://www.youtube.com/watch?v=3cNEbnp6NGQ
 
 ## Fetch AR Tracking and Object Manipulation
 Assorted python scripts and launch files for moving the arm to a tf frame (projected by an AR tag).
