@@ -1,6 +1,10 @@
 # Assorted Fetch Packages
 
 ## Fetch Mapping
+Using Google Cartographer to build a map for navigation.
+
+[![Watch the video](https://github.com/JamesUnicomb/fetch_ros/blob/master/cas_mapping.png)](https://www.youtube.com/watch?v=wfDlKFzTJpk)
+Video Link: https://www.youtube.com/watch?v=wfDlKFzTJpk
 
 ## Fetch Navigation
 
