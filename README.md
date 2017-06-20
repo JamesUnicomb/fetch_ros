@@ -3,6 +3,12 @@
 ## Fetch Mapping
 Using Google Cartographer to build a map for navigation.
 
+To run the mapping with a reecorded ros bag:
+'''
+roslaunch fetch_mapping fetch_mapping_2d.launch
+rosbag play /path/to/bagfile/file.bag
+'''
+
 [![Watch the video](https://github.com/JamesUnicomb/fetch_ros/blob/master/cas_mapping.png)](https://www.youtube.com/watch?v=wfDlKFzTJpk)
 Video Link: https://www.youtube.com/watch?v=wfDlKFzTJpk
 
